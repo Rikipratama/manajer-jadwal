@@ -114,7 +114,7 @@
         .button-group {
             display: flex;
             justify-content: center;
-            gap: 1rem; /* Jarak antar tombol */
+            gap: 1rem;
             margin-top: 1.5rem;
             margin-bottom: 1rem;
         }
@@ -129,11 +129,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
-            flex-shrink: 0; /* Mencegah tombol mengecil */
+            flex-shrink: 0;
         }
 
         button.add-row-btn {
-            background: linear-gradient(45deg, #28a745, #218838); /* Warna hijau untuk tambah baris */
+            background: linear-gradient(45deg, #28a745, #218838);
             box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
         }
         button.add-row-btn:hover {
@@ -209,10 +209,55 @@
                 border: 1px solid #ccc !important;
             }
 
-            button, .notes, .button-group { /* Sembunyikan juga button-group saat print */
+            button, .notes, .button-group {
                 display: none;
             }
         }
+        /* --- Styles for PDF Export (Super Clean) --- */
+        /* Temporary class added to body when exporting to PDF */
+        body.pdf-export-mode {
+            background: #ffffff !important; /* Force white background */
+            color: #000000 !important; /* Force black text */
+        }
+
+        body.pdf-export-mode .schedule-container {
+            background: #ffffff !important;
+            box-shadow: none !important;
+            border: 1px solid #cccccc !important;
+            backdrop-filter: none !important;
+        }
+
+        body.pdf-export-mode header,
+        body.pdf-export-mode footer {
+            background: #f0f0f0 !important; /* Light gray for header/footer */
+            color: #333333 !important;
+            border: none !important;
+        }
+
+        body.pdf-export-mode table {
+            background: #ffffff !important;
+            border: 1px solid #cccccc !important;
+        }
+
+        body.pdf-export-mode th {
+            background: #e0e0e0 !important; /* Light gray for table header */
+            color: #333333 !important;
+            border: 1px solid #cccccc !important;
+            text-shadow: none !important; /* Remove text shadow */
+        }
+
+        body.pdf-export-mode td {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border: 1px solid #cccccc !important;
+        }
+
+        body.pdf-export-mode button,
+        body.pdf-export-mode .notes,
+        body.pdf-export-mode .button-group {
+            display: none !important; /* Hide buttons and notes in PDF */
+        }
+
 
         /* Responsive Design */
         @media (max-width: 900px) {
@@ -247,12 +292,12 @@
                 min-width: 120px;
             }
             .button-group {
-                flex-direction: column; /* Tombol jadi vertikal di layar kecil */
+                flex-direction: column;
                 align-items: center;
             }
             button {
-                width: 80%; /* Tombol lebih lebar di layar kecil */
-                margin-bottom: 0.8rem; /* Jarak antar tombol vertikal */
+                width: 80%;
+                margin-bottom: 0.8rem;
             }
         }
 
@@ -357,21 +402,20 @@
             const exportPdfBtn = document.getElementById('exportPdfBtn');
             const addRowBtn = document.getElementById('addRowBtn');
             const scheduleTableBody = document.querySelector('#scheduleTable tbody');
+            const body = document.body; // Ambil elemen body
 
             // Fungsi untuk menambah baris baru
             addRowBtn.addEventListener('click', () => {
                 const newRow = document.createElement('tr');
-                // Kolom pertama untuk waktu
                 const timeCell = document.createElement('td');
                 timeCell.contentEditable = "true";
-                timeCell.textContent = "Waktu Baru"; // Default text
+                timeCell.textContent = "Waktu Baru";
                 newRow.appendChild(timeCell);
 
-                // Tambahkan 7 kolom lagi untuk setiap hari (Senin-Minggu)
                 for (let i = 0; i < 7; i++) {
                     const activityCell = document.createElement('td');
                     activityCell.contentEditable = "true";
-                    activityCell.textContent = "Kegiatan Baru"; // Default text
+                    activityCell.textContent = "Kegiatan Baru";
                     newRow.appendChild(activityCell);
                 }
                 scheduleTableBody.appendChild(newRow);
@@ -381,13 +425,20 @@
             exportPdfBtn.addEventListener('click', () => {
                 const scheduleContainer = document.getElementById('schedule-to-print');
 
+                // --- START: PDF specific styling for super clean output ---
+                // Tambahkan class sementara ke body untuk styling khusus PDF
+                body.classList.add('pdf-export-mode');
+                // --- END: PDF specific styling ---
+
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('landscape');
 
                 html2canvas(scheduleContainer, {
                     scale: 2,
                     useCORS: true,
-                    backgroundColor: null,
+                    backgroundColor: null, // Biarkan background diatur oleh CSS `.pdf-export-mode`
+                    // Penting: Hapus opsi ignoreElements jika ada yang disembunyikan
+                    // karena kita akan mengatur visibility via CSS class
                 }).then(canvas => {
                     const imgData = canvas.toDataURL('image/png');
                     const imgWidth = 280;
@@ -407,10 +458,18 @@
                         heightLeft -= pageHeight;
                     }
 
-                    doc.save('jadwal_manajer.pdf');
+                    doc.save('jadwal_manajer_bersih.pdf');
+
+                    // --- START: PDF specific styling cleanup ---
+                    // Hapus kembali class setelah PDF dibuat agar tampilan web kembali normal
+                    body.classList.remove('pdf-export-mode');
+                    // --- END: PDF specific styling cleanup ---
+
                 }).catch(error => {
                     console.error('Terjadi kesalahan saat membuat PDF:', error);
                     alert('Gagal membuat PDF. Coba lagi atau pastikan tidak ada konten yang aneh.');
+                    // Pastikan class juga dihapus jika terjadi error
+                    body.classList.remove('pdf-export-mode');
                 });
             });
         });
