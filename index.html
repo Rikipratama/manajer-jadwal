@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Produktif Fata (Geologi UPN)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Background gradasi gelap */
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #e0e0e0; /* Warna teks terang */
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.4); /* Background header semi-transparan */
+            color: #fff;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Mengatur item dari atas */
+        }
+
+        .schedule-container {
+            background: rgba(255, 255, 255, 0.08); /* Background container semi-transparan */
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 1200px;
+            width: 100%;
+            backdrop-filter: blur(5px); /* Efek blur pada background container */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .schedule-container h2 {
+            text-align: center;
+            color: #a7d9ff; /* Warna judul section */
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            background: rgba(0, 0, 0, 0.3); /* Background tabel semi-transparan */
+            border-radius: 10px;
+            overflow: hidden; /* Penting untuk border-radius di tabel */
+        }
+
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            text-align: center;
+            color: #e0e0e0;
+        }
+
+        th {
+            background: linear-gradient(90deg, #3f0071, #6b00b8); /* Gradasi background header tabel */
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            position: sticky; /* Sticky header untuk scroll horizontal */
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            background: rgba(0, 0, 0, 0.2); /* Background sel tabel */
+            transition: background-color 0.3s ease;
+        }
+
+        td:hover {
+            background-color: rgba(0, 0, 0, 0.4); /* Efek hover pada sel */
+        }
+
+        /* Editable cells */
+        td[contenteditable="true"]:focus {
+            outline: 2px solid #a7d9ff; /* Outline saat sel diedit */
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Button Styling */
+        button {
+            display: block;
+            width: fit-content;
+            margin: 0 auto 1rem auto; /* Posisi di tengah */
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, #007bff, #00c6ff); /* Gradasi background tombol */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #0056b3, #0099cc);
+            box-shadow: 0 7px 20px rgba(0, 123, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .notes {
+            text-align: center;
+            font-style: italic;
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto; /* Push footer to the bottom */
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .schedule-container {
+                padding: 1.5rem;
+            }
+            th, td {
+                padding: 0.8rem;
+                font-size: 0.85rem;
+            }
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 0.95rem;
+            }
+            main {
+                padding: 1rem;
+            }
+            .schedule-container {
+                padding: 1rem;
+            }
+            table {
+                display: block; /* Membuat tabel bisa di-scroll secara horizontal */
+                overflow-x: auto;
+                white-space: nowrap; /* Mencegah teks wrapping */
+            }
+            th, td {
+                min-width: 120px; /* Lebar minimum kolom */
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.7rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+            button {
+                padding: 0.7rem 1.5rem;
+                font-size: 1rem;
+            }
+            .notes {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Jadwal Mingguan Mahasiswa Baru Geologi</h1>
+        <p>Halo Fata, ini jadwalmu biar tetap produktif & chill!</p>
+    </header>
+
+    <main>
+        <section class="schedule-container">
+            <h2>Rencana Mingguan</h2>
+            <div id="schedule-table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Senin</th>
+                            <th>Selasa</th>
+                            <th>Rabu</th>
+                            <th>Kamis</th>
+                            <th>Jumat</th>
+                            <th>Jum'at</th>
+                            <th>Sabtu</th>
+                            <th>Minggu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Pagi (08.00-12.00)</td>
+                            <td contenteditable="true">Kuliah</td>
+                            <td contenteditable="true">Kuliah</td>
+                            <td contenteditable="true">Kuliah</td>
+                            <td contenteditable="true">Kuliah</td>
+                            <td contenteditable="true">Kuliah</td>
+                            <td contenteditable="true">Belajar Mandiri (2 jam)</td>
+                            <td contenteditable="true">Santai/Hobi</td>
+                        </tr>
+                        <tr>
+                            <td>Siang (12.00-16.00)</td>
+                            <td contenteditable="true">Istirahat/Makan & Belajar Mandiri (1.5 jam)</td>
+                            <td contenteditable="true">Istirahat/Makan & Belajar Mandiri (1.5 jam)</td>
+                            <td contenteditable="true">Istirahat/Makan & Belajar Mandiri (1.5 jam)</td>
+                            <td contenteditable="true">Istirahat/Makan & Belajar Mandiri (1.5 jam)</td>
+                            <td contenteditable="true">Istirahat/Makan & Belajar Mandiri (2 jam)</td>
+                            <td contenteditable="true">Santai/Sosial (Billiard Opsional)</td>
+                            <td contenteditable="true">Santai/Sosial (Billiard Opsional)</td>
+                        </tr>
+                        <tr>
+                            <td>Sore (16.00-19.00)</td>
+                            <td contenteditable="true">Santai/Sosial</td>
+                            <td contenteditable="true">Santai/Sosial</td>
+                            <td contenteditable="true">Santai/Sosial</td>
+                            <td contenteditable="true">Santai/Sosial</td>
+                            <td contenteditable="true">Santai/Sosial</td>
+                            <td contenteditable="true">Billiard (1 sesi)</td>
+                            <td contenteditable="true">Billiard (1 sesi)</td>
+                        </tr>
+                        <tr>
+                            <td>Malam (19.00-Selesai)</td>
+                            <td contenteditable="true">Persiapan Besok & Istirahat</td>
+                            <td contenteditable="true">Persiapan Besok & Istirahat</td>
+                            <td contenteditable="true">Persiapan Besok & Istirahat</td>
+                            <td contenteditable="true">Persiapan Besok & Istirahat</td>
+                            <td contenteditable="true">Persiapan Besok & Istirahat</td>
+                            <td contenteditable="true">Santai/Sosial</td>
+                            <td contenteditable="true">Santai/Sosial</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button id="exportPdfBtn">Ekspor Jadwal ke PDF</button>
+            <p class="notes">*Kamu bisa klik dan edit langsung isi tabelnya ya!</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Jadwal Produktif Fata. Dibuat dengan semangat mahasiswa Geologi UPN!</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ambil tombol export
+            const exportPdfBtn = document.getElementById('exportPdfBtn');
+
+            // Tambahkan event listener saat tombol diklik
+            exportPdfBtn.addEventListener('click', () => {
+                // Ambil elemen yang ingin dikonversi ke PDF (tabel di dalam wrapper)
+                const scheduleTableWrapper = document.getElementById('schedule-table-wrapper');
+
+                // Buat objek jsPDF baru
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('landscape'); // Menggunakan orientasi landscape agar tabel muat
+
+                // Menggunakan html2canvas untuk merender elemen HTML menjadi gambar
+                // Lalu gambar tersebut ditambahkan ke PDF
+                html2canvas(scheduleTableWrapper, {
+                    scale: 2, // Meningkatkan skala untuk kualitas yang lebih baik
+                    useCORS: true // Penting jika ada gambar atau aset dari luar domain
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png'); // Konversi canvas ke data URL (gambar PNG)
+                    const imgWidth = 280; // Lebar gambar dalam PDF (sesuaikan agar pas di landscape A4)
+                    const pageHeight = doc.internal.pageSize.height;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+
+                    let position = 10; // Posisi awal dari atas (margin)
+
+                    // Tambahkan gambar ke PDF
+                    doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+
+                    // Jika gambar terlalu panjang dan butuh halaman baru
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight + 10; // Sesuaikan posisi untuk halaman baru
+                        doc.addPage();
+                        doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+
+                    // Simpan PDF dengan nama file
+                    doc.save('jadwal_produktif_fata.pdf');
+                }).catch(error => {
+                    console.error('Terjadi kesalahan saat membuat PDF:', error);
+                    alert('Gagal membuat PDF. Coba lagi atau pastikan tidak ada konten yang aneh.');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
