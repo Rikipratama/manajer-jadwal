@@ -8,391 +8,363 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* General Styling */
+        /* Mobile First Design */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: #e0e0e0;
-            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.5;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
         }
 
         header {
-            background: rgba(0, 0, 0, 0.4);
-            color: #fff;
-            padding: 2rem 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
             text-align: center;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+            color: #4a5568;
+            font-weight: 700;
         }
 
         header p {
-            font-size: 1.1rem;
-            color: #b0b0b0;
+            font-size: 0.9rem;
+            color: #718096;
+            margin: 0;
         }
 
         main {
-            flex-grow: 1;
-            padding: 2rem;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex: 1;
+            padding: 1rem;
         }
 
         .schedule-container {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 2.5rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            max-width: 1200px;
-            width: 100%;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            max-width: 100%;
+            margin: 0 auto;
         }
 
         .schedule-container h2 {
             text-align: center;
-            color: #a7d9ff;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            color: #4a5568;
+            font-size: 1.25rem;
+            margin: 0 0 1rem 0;
+            font-weight: 600;
         }
 
-        /* Table Styling */
+        /* Responsive Table */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
         table {
             width: 100%;
+            min-width: 700px;
             border-collapse: collapse;
-            margin-bottom: 1.5rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            overflow: hidden;
+            background: white;
+            font-size: 0.8rem;
         }
 
         th, td {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            text-align: center;
-            color: #e0e0e0;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem;
+            text-align: left;
+            vertical-align: top;
         }
 
         th {
-            background: linear-gradient(90deg, #3f0071, #6b00b8);
-            color: #fff;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.95rem;
+            background: #4a5568;
+            color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-align: center;
             position: sticky;
             top: 0;
             z-index: 10;
         }
 
-        td {
-            background: rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease;
+        td[contenteditable="true"] {
+            min-height: 2rem;
+            cursor: text;
         }
 
-        td:hover {
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        /* Editable cells */
         td[contenteditable="true"]:focus {
-            outline: 2px solid #a7d9ff;
-            background-color: rgba(255, 255, 255, 0.15);
+            outline: 2px solid #667eea;
+            background-color: #f8fafc;
         }
 
-        /* Button Styling */
+        td[contenteditable="true"]:empty::before {
+            content: "Tambah kegiatan...";
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        .time-cell {
+            background: #f7fafc !important;
+            font-weight: 600;
+            color: #4a5568;
+            white-space: nowrap;
+            min-width: 120px;
+        }
+
+        /* Buttons */
         .button-group {
             display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap; /* Tombol bisa wrap ke baris baru di layar kecil */
+            flex-direction: column;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            align-items: center;
         }
 
         button {
-            padding: 0.8rem 2rem;
-            background: linear-gradient(45deg, #007bff, #00c6ff);
-            color: #fff;
+            padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
-            flex-shrink: 0;
-        }
-
-        button.add-row-btn {
-            background: linear-gradient(45deg, #28a745, #218838);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
-        }
-        button.add-row-btn:hover {
-            background: linear-gradient(45deg, #218838, #1e7e34);
-            box-shadow: 0 7px 20px rgba(40, 167, 69, 0.6);
-        }
-
-        /* Delete Button in table */
-        .delete-btn {
-            background: linear-gradient(45deg, #dc3545, #c82333); /* Merah untuk hapus */
-            color: #fff;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
             font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
-            margin: 0 auto; /* Tengahin */
-            display: block; /* Agar bisa pakai margin auto */
+            width: 100%;
+            max-width: 280px;
         }
-        .delete-btn:hover {
-            background: linear-gradient(45deg, #c82333, #bd2130);
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+
+        .add-btn {
+            background: #48bb78;
+            color: white;
+        }
+
+        .add-btn:hover {
+            background: #38a169;
             transform: translateY(-1px);
         }
-        .delete-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+
+        .export-btn {
+            background: #4299e1;
+            color: white;
         }
 
-
-        button:hover {
-            background: linear-gradient(45deg, #0056b3, #0099cc);
-            box-shadow: 0 7px 20px rgba(0, 123, 255, 0.6);
-            transform: translateY(-2px);
+        .export-btn:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
         }
 
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+        .delete-btn {
+            background: #f56565;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            width: auto;
+            max-width: none;
+        }
+
+        .delete-btn:hover {
+            background: #e53e3e;
+        }
+
+        .action-cell {
+            text-align: center;
+            width: 60px;
+            min-width: 60px;
         }
 
         .notes {
             text-align: center;
+            font-size: 0.8rem;
+            color: #718096;
+            margin: 1rem 0;
             font-style: italic;
-            color: #b0b0b0;
-            font-size: 0.9rem;
-            margin-top: 1rem;
         }
 
         footer {
+            background: rgba(255, 255, 255, 0.95);
             text-align: center;
-            padding: 1.5rem;
-            background: rgba(0, 0, 0, 0.4);
-            color: #b0b0b0;
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: auto;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #718096;
+            backdrop-filter: blur(10px);
         }
 
-        /* Print Specific Styles */
-        @media print {
-            body {
-                background: #fff;
-                color: #000;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            header, footer {
-                background: #f0f0f0 !important;
-                color: #333 !important;
-                border: none !important;
-            }
-
-            .schedule-container {
-                background: #fff !important;
-                box-shadow: none !important;
-                border: 1px solid #ccc !important;
-                backdrop-filter: none !important;
-                border-radius: 0 !important; /* Remove border-radius for print */
-            }
-
-            table {
-                background: #fff !important;
-                border: 1px solid #ccc !important;
-                border-radius: 0 !important; /* Remove border-radius for print */
-            }
-
-            th {
-                background: #e0e0e0 !important;
-                color: #333 !important;
-                border: 1px solid #ccc !important;
-                position: static !important; /* Fix for sticky header issue in print */
-            }
-
-            td {
-                background: #fff !important;
-                color: #000 !important;
-                border: 1px solid #ccc !important;
-            }
-
-            /* Hide all interactive elements and buttons when printing */
-            button, .notes, .button-group, .delete-btn, th:last-child, td:last-child {
-                display: none !important;
-            }
+        /* Loading indicator */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
         }
-        /* --- Styles for PDF Export (Super Clean) --- */
-        /* Temporary class added to body when exporting to PDF */
-        body.pdf-export-mode {
-            background: #ffffff !important;
-            color: #000000 !important;
-            /* Reset all visual effects to make rendering simple */
-            filter: none !important;
-            text-shadow: none !important;
+
+        /* PDF Export Styles */
+        body.pdf-mode {
+            background: white !important;
+            color: black !important;
+        }
+
+        body.pdf-mode header,
+        body.pdf-mode footer,
+        body.pdf-mode .schedule-container {
+            background: white !important;
             box-shadow: none !important;
-            border: none !important;
-            outline: none !important;
-            -webkit-font-smoothing: antialiased; /* Ensure text looks good */
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        body.pdf-export-mode .schedule-container {
-            background: #ffffff !important;
-            box-shadow: none !important;
-            border: 1px solid #cccccc !important;
             backdrop-filter: none !important;
-            border-radius: 0 !important; /* Remove border-radius */
         }
 
-        body.pdf-export-mode header,
-        body.pdf-export-mode footer {
-            background: #f0f0f0 !important;
-            color: #333333 !important;
-            border: none !important;
-            text-shadow: none !important;
-        }
-        body.pdf-export-mode header h1, body.pdf-export-mode header p {
-            text-shadow: none !important;
-        }
-        body.pdf-export-mode .schedule-container h2 {
-            color: #333333 !important; /* Darker color for headings */
-            text-shadow: none !important;
+        body.pdf-mode th {
+            background: #f8f9fa !important;
+            color: #333 !important;
+            position: static !important;
         }
 
-        body.pdf-export-mode table {
-            background: #ffffff !important;
-            border: 1px solid #cccccc !important;
-            border-radius: 0 !important; /* Remove border-radius */
-        }
-
-        body.pdf-export-mode th {
-            background: #e0e0e0 !important;
-            color: #333333 !important;
-            border: 1px solid #cccccc !important;
-            text-shadow: none !important;
-            position: static !important; /* Crucial for html2canvas rendering */
-        }
-
-        body.pdf-export-mode td {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border: 1px solid #cccccc !important;
-        }
-
-        /* Hide interactive elements and action column in PDF */
-        body.pdf-export-mode button,
-        body.pdf-export-mode .notes,
-        body.pdf-export-mode .button-group,
-        body.pdf-export-mode .delete-btn,
-        body.pdf-export-mode th:last-child, /* Hide 'Aksi' column header */
-        body.pdf-export-mode td:last-child { /* Hide 'Hapus' buttons */
+        body.pdf-mode .button-group,
+        body.pdf-mode .notes,
+        body.pdf-mode .delete-btn,
+        body.pdf-mode .action-cell,
+        body.pdf-mode th:last-child {
             display: none !important;
         }
 
+        /* Tablet styles */
+        @media (min-width: 768px) {
+            header {
+                padding: 2rem 1rem;
+            }
 
-        /* Responsive Design */
-        @media (max-width: 900px) {
-            .schedule-container {
-                padding: 1.5rem;
-            }
-            th, td {
-                padding: 0.8rem;
-                font-size: 0.85rem;
-            }
             header h1 {
                 font-size: 2rem;
             }
-        }
 
-        @media (max-width: 768px) {
-            body {
-                font-size: 0.95rem;
-            }
-            main {
-                padding: 1rem;
-            }
-            .schedule-container {
-                padding: 1rem;
-            }
-            table {
-                display: block;
-                overflow-x: auto; /* Penting untuk tabel agar bisa di-scroll di mobile */
-                white-space: nowrap; /* Mencegah wrap teks di sel */
-            }
-            th, td {
-                min-width: 120px;
-            }
-            /* Make action column minimal width */
-            th:last-child, td:last-child {
-                min-width: 80px; /* Adjust as needed */
-            }
-            .button-group {
-                flex-direction: column;
-                align-items: center;
-            }
-            button {
-                width: 80%;
-                margin-bottom: 0.8rem;
-            }
-            .delete-btn {
-                padding: 0.4rem 0.8rem; /* Lebih kecil di mobile */
-                font-size: 0.8rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 1.7rem;
-            }
             header p {
                 font-size: 1rem;
             }
-            button {
-                padding: 0.7rem 1.5rem;
-                font-size: 1rem;
+
+            .schedule-container {
+                padding: 2rem;
             }
-            .notes {
+
+            .schedule-container h2 {
+                font-size: 1.5rem;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
+
+            .button-group {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            button {
+                width: auto;
+                min-width: 200px;
+            }
+        }
+
+        /* Desktop styles */
+        @media (min-width: 1024px) {
+            main {
+                padding: 2rem;
+            }
+
+            .schedule-container {
+                max-width: 1200px;
+            }
+
+            table {
+                font-size: 1rem;
+                min-width: 800px;
+            }
+
+            th, td {
+                padding: 1rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            header, footer {
+                background: white !important;
+                box-shadow: none !important;
+            }
+
+            .schedule-container {
+                background: white !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+
+            .button-group,
+            .notes,
+            .delete-btn,
+            .action-cell,
+            th:last-child {
+                display: none !important;
+            }
+
+            table {
+                page-break-inside: avoid;
                 font-size: 0.8rem;
+            }
+
+            th {
+                background: #f0f0f0 !important;
+                color: black !important;
+                position: static !important;
             }
         }
     </style>
 </head>
 <body>
+    <div class="loading" id="loadingIndicator">
+        <div>Membuat PDF...</div>
+    </div>
+
     <header>
-        <h1>Jadwal Manajer Mingguan</h1>
-        <p>Atur waktumu sefleksibel mungkin, tetap produktif & chill!</p>
+        <h1>📅 Jadwal Manajer Mingguan</h1>
+        <p>Atur jadwal flexibel, tetap produktif & santai!</p>
     </header>
 
     <main>
-        <section class="schedule-container" id="schedule-to-print">
+        <section class="schedule-container" id="scheduleContainer">
             <h2>Rencana Mingguan</h2>
-            <div id="schedule-table-wrapper">
+            
+            <div class="table-wrapper">
                 <table id="scheduleTable">
                     <thead>
                         <tr>
-                            <th>Waktu</th>
+                            <th style="width: 120px;">⏰ Waktu</th>
                             <th>Senin</th>
                             <th>Selasa</th>
                             <th>Rabu</th>
@@ -400,178 +372,326 @@
                             <th>Jumat</th>
                             <th>Sabtu</th>
                             <th>Minggu</th>
-                            <th class="action-column">Aksi</th> </tr>
+                            <th class="action-cell">Aksi</th>
+                        </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Pagi (08.00-12.00)</td>
+                            <td class="time-cell">🌅 Pagi<br>(08.00-12.00)</td>
                             <td contenteditable="true">Meeting Tim A</td>
-                            <td contenteditable="true">Fokus Kerja Proyek X</td>
-                            <td contenteditable="true">Koordinasi Eksternal</td>
+                            <td contenteditable="true">Deep Work - Proyek X</td>
+                            <td contenteditable="true">Koordinasi Partner</td>
                             <td contenteditable="true">Strategic Planning</td>
-                            <td contenteditable="true">Review Laporan Mingguan</td>
-                            <td contenteditable="true">Olahraga / Me-time</td>
-                            <td contenteditable="true">Waktu Keluarga</td>
-                            <td class="action-cell"><button class="delete-btn">Hapus</button></td> </tr>
-                        <tr>
-                            <td>Siang (12.00-16.00)</td>
-                            <td contenteditable="true">Istirahat & Networking</td>
-                            <td contenteditable="true">Follow Up Klien</td>
-                            <td contenteditable="true">Pelatihan Skill Baru</td>
-                            <td contenteditable="true">Mentoring Tim</td>
-                            <td contenteditable="true">Evaluasi Performa</td>
-                            <td contenteditable="true">Hobi / Rekreasi</td>
-                            <td contenteditable="true">Persiapan Minggu Depan</td>
-                            <td class="action-cell"><button class="delete-btn">Hapus</button></td>
+                            <td contenteditable="true">Review Mingguan</td>
+                            <td contenteditable="true">Olahraga Pagi</td>
+                            <td contenteditable="true">Family Time</td>
+                            <td class="action-cell"><button class="delete-btn">🗑️</button></td>
                         </tr>
                         <tr>
-                            <td>Sore (16.00-19.00)</td>
-                            <td contenteditable="true">Pekerjaan Administratif</td>
-                            <td contenteditable="true">Diskusi Inovasi</td>
-                            <td contenteditable="true">Networking Event (Opsional)</td>
-                            <td contenteditable="true">Brainstorming Ide</td>
-                            <td contenteditable="true">Closing Tugas Hari Ini</td>
-                            <td contenteditable="true">Sosial & Nongkrong</td>
-                            <td contenteditable="true">Santai</td>
-                            <td class="action-cell"><button class="delete-btn">Hapus</button></td>
+                            <td class="time-cell">☀️ Siang<br>(12.00-16.00)</td>
+                            <td contenteditable="true">Networking Lunch</td>
+                            <td contenteditable="true">Client Follow-up</td>
+                            <td contenteditable="true">Skill Training</td>
+                            <td contenteditable="true">Team Mentoring</td>
+                            <td contenteditable="true">Performance Review</td>
+                            <td contenteditable="true">Hobi & Me-time</td>
+                            <td contenteditable="true">Planning Next Week</td>
+                            <td class="action-cell"><button class="delete-btn">🗑️</button></td>
                         </tr>
                         <tr>
-                            <td>Malam (19.00-Selesai)</td>
-                            <td contenteditable="true">Riset & Analisis Data</td>
-                            <td contenteditable="true">Baca Buku / Meditasi</td>
-                            <td contenteditable="true">Quality Time Keluarga</td>
-                            <td contenteditable="true">Jalan-jalan Santai</td>
-                            <td contenteditable="true">Me Time / Hiburan</td>
-                            <td contenteditable="true">Kumpul Teman</td>
-                            <td contenteditable="true">Istirahat Total</td>
-                            <td class="action-cell"><button class="delete-btn">Hapus</button></td>
+                            <td class="time-cell">🌆 Sore<br>(16.00-19.00)</td>
+                            <td contenteditable="true">Admin Tasks</td>
+                            <td contenteditable="true">Innovation Session</td>
+                            <td contenteditable="true">Networking Event</td>
+                            <td contenteditable="true">Creative Brainstorm</td>
+                            <td contenteditable="true">Daily Wrap-up</td>
+                            <td contenteditable="true">Social Hangout</td>
+                            <td contenteditable="true">Chill Time</td>
+                            <td class="action-cell"><button class="delete-btn">🗑️</button></td>
+                        </tr>
+                        <tr>
+                            <td class="time-cell">🌙 Malam<br>(19.00-22.00)</td>
+                            <td contenteditable="true">Research & Analysis</td>
+                            <td contenteditable="true">Reading & Learning</td>
+                            <td contenteditable="true">Quality Family Time</td>
+                            <td contenteditable="true">Evening Walk</td>
+                            <td contenteditable="true">Personal Entertainment</td>
+                            <td contenteditable="true">Friends Gathering</td>
+                            <td contenteditable="true">Rest & Recharge</td>
+                            <td class="action-cell"><button class="delete-btn">🗑️</button></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
             <div class="button-group">
-                <button id="addRowBtn" class="add-row-btn">Tambah Baris Waktu</button>
-                <button id="exportPdfBtn">Ekspor Jadwal ke PDF</button>
+                <button id="addRowBtn" class="add-btn">➕ Tambah Slot Waktu</button>
+                <button id="exportPdfBtn" class="export-btn">📄 Download PDF</button>
+                <button id="saveDataBtn" class="export-btn">💾 Simpan Data</button>
+                <button id="loadDataBtn" class="add-btn">📂 Muat Data</button>
             </div>
-            <p class="notes">*Psst, kamu bisa klik dan edit langsung isi tabelnya dan hapus baris yang nggak perlu!</p>
+
+            <p class="notes">💡 Tip: Klik langsung pada sel untuk mengedit, gunakan tombol 🗑️ untuk hapus baris</p>
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2025 Jadwal Manajer. Dibuat dengan data dan cinta oleh Riki.</p>
+        <p>© 2025 Jadwal Manajer - Dibuat dengan ❤️ oleh Riki | <a href="#" id="resetBtn" style="color: #667eea;">Reset ke Default</a></p>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const exportPdfBtn = document.getElementById('exportPdfBtn');
-            const addRowBtn = document.getElementById('addRowBtn');
-            const scheduleTable = document.getElementById('scheduleTable'); // Ambil tabelnya langsung
-            const scheduleTableBody = scheduleTable.querySelector('tbody');
-            const body = document.body;
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
 
-            // Fungsi untuk menambah baris baru
-            const addRow = () => {
+    <script>
+        class ScheduleManager {
+            constructor() {
+                this.initializeElements();
+                this.attachEventListeners();
+                this.loadFromStorage();
+            }
+
+            initializeElements() {
+                this.table = document.getElementById('scheduleTable');
+                this.tbody = this.table.querySelector('tbody');
+                this.addRowBtn = document.getElementById('addRowBtn');
+                this.exportPdfBtn = document.getElementById('exportPdfBtn');
+                this.saveDataBtn = document.getElementById('saveDataBtn');
+                this.loadDataBtn = document.getElementById('loadDataBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.fileInput = document.getElementById('fileInput');
+                this.loadingIndicator = document.getElementById('loadingIndicator');
+                this.scheduleContainer = document.getElementById('scheduleContainer');
+            }
+
+            attachEventListeners() {
+                this.addRowBtn.addEventListener('click', () => this.addNewRow());
+                this.exportPdfBtn.addEventListener('click', () => this.exportToPDF());
+                this.saveDataBtn.addEventListener('click', () => this.saveData());
+                this.loadDataBtn.addEventListener('click', () => this.loadData());
+                this.resetBtn.addEventListener('click', () => this.resetToDefault());
+                this.fileInput.addEventListener('change', (e) => this.handleFileLoad(e));
+                
+                // Event delegation for delete buttons and auto-save
+                this.tbody.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('delete-btn')) {
+                        this.deleteRow(e.target);
+                    }
+                });
+
+                this.tbody.addEventListener('input', () => {
+                    this.autoSave();
+                });
+            }
+
+            addNewRow() {
                 const newRow = document.createElement('tr');
-                // Kolom pertama untuk waktu
+                
+                // Time cell
                 const timeCell = document.createElement('td');
-                timeCell.contentEditable = "true";
-                timeCell.textContent = "Waktu Baru";
+                timeCell.className = 'time-cell';
+                timeCell.contentEditable = 'true';
+                timeCell.textContent = '🕒 Waktu Baru';
                 newRow.appendChild(timeCell);
 
-                // Tambahkan 7 kolom lagi untuk setiap hari (Senin-Minggu)
+                // Activity cells (7 days)
                 for (let i = 0; i < 7; i++) {
-                    const activityCell = document.createElement('td');
-                    activityCell.contentEditable = "true";
-                    activityCell.textContent = "Kegiatan Baru";
-                    newRow.appendChild(activityCell);
+                    const cell = document.createElement('td');
+                    cell.contentEditable = 'true';
+                    cell.textContent = '';
+                    newRow.appendChild(cell);
                 }
 
-                // Tambah kolom Aksi dengan tombol Hapus
+                // Action cell
                 const actionCell = document.createElement('td');
-                actionCell.classList.add('action-cell');
-                const deleteButton = document.createElement('button');
-                deleteButton.classList.add('delete-btn');
-                deleteButton.textContent = "Hapus";
-                deleteButton.addEventListener('click', () => {
-                    newRow.remove(); // Hapus baris saat tombol diklik
-                });
-                actionCell.appendChild(deleteButton);
+                actionCell.className = 'action-cell';
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '🗑️';
+                actionCell.appendChild(deleteBtn);
                 newRow.appendChild(actionCell);
 
-                scheduleTableBody.appendChild(newRow);
-            };
+                this.tbody.appendChild(newRow);
+                this.autoSave();
+            }
 
-            addRowBtn.addEventListener('click', addRow);
-
-            // Tambahkan event listener untuk tombol hapus yang sudah ada dari awal
-            // Menggunakan event delegation agar tombol yang baru ditambah juga berfungsi
-            scheduleTableBody.addEventListener('click', (event) => {
-                if (event.target.classList.contains('delete-btn')) {
-                    event.target.closest('tr').remove();
+            deleteRow(button) {
+                if (this.tbody.children.length > 1) {
+                    button.closest('tr').remove();
+                    this.autoSave();
+                } else {
+                    alert('Minimal harus ada satu baris jadwal!');
                 }
-            });
+            }
 
+            async exportToPDF() {
+                this.showLoading(true);
+                
+                try {
+                    document.body.classList.add('pdf-mode');
+                    
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('landscape', 'mm', 'a4');
+                    
+                    // Optimized canvas settings for smaller file size
+                    const canvas = await html2canvas(this.scheduleContainer, {
+                        scale: 1.5, // Reduced from 2 to balance quality and size
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        imageTimeout: 10000,
+                        removeContainer: true,
+                        logging: false, // Disable logging for cleaner output
+                        width: this.scheduleContainer.scrollWidth,
+                        height: this.scheduleContainer.scrollHeight,
+                        foreignObjectRendering: false // Better compatibility
+                    });
 
-            exportPdfBtn.addEventListener('click', () => {
-                const scheduleContainer = document.getElementById('schedule-to-print');
-
-                // --- START: PDF specific styling for super clean output ---
-                body.classList.add('pdf-export-mode');
-                // --- END: PDF specific styling ---
-
-                const { jsPDF } = window.jspdf;
-                // Atur orientasi landscape dan ukuran A4
-                const doc = new jsPDF('landscape', 'mm', 'a4'); // 'mm' for millimeters, 'a4' for A4 size
-
-                html2canvas(scheduleContainer, {
-                    scale: 2, // Kualitas gambar lebih baik, tapi mungkin sedikit lebih besar
-                    useCORS: true,
-                    backgroundColor: '#ffffff', // Pastikan background putih
-                    imageTimeout: 15000, // Timeout lebih lama untuk gambar (penting di HP)
-                    // windowWidth dan windowHeight bisa membantu simulasi rendering mobile
-                    // Tapi kadang bisa juga bikin masalah, coba dihapus kalau aneh.
-                    // windowWidth: document.querySelector('body').scrollWidth,
-                    // windowHeight: document.querySelector('body').scrollHeight,
-                }).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
+                    // Calculate dimensions to fit A4 landscape
+                    const imgData = canvas.toDataURL('image/jpeg', 0.8); // JPEG with 80% quality for smaller size
                     const pdfWidth = doc.internal.pageSize.getWidth();
                     const pdfHeight = doc.internal.pageSize.getHeight();
                     
-                    const imgProportion = canvas.width / canvas.height;
-                    let imgWidthInPdf = pdfWidth - 20; // 10mm margin on each side
-                    let imgHeightInPdf = imgWidthInPdf / imgProportion;
-
-                    // Jika gambar terlalu tinggi untuk satu halaman, sesuaikan lebarnya
-                    if (imgHeightInPdf > pdfHeight - 20) { // 10mm margin on top/bottom
-                        imgHeightInPdf = pdfHeight - 20;
-                        imgWidthInPdf = imgHeightInPdf * imgProportion;
-                    }
+                    const imgWidth = pdfWidth - 20; // 10mm margin each side
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
                     
-                    // Tengahin gambar
-                    const x = (pdfWidth - imgWidthInPdf) / 2;
-                    const y = (pdfHeight - imgHeightInPdf) / 2;
+                    const x = 10; // 10mm left margin
+                    const y = Math.max(10, (pdfHeight - imgHeight) / 2); // Center vertically
 
+                    doc.addImage(imgData, 'JPEG', x, y, imgWidth, Math.min(imgHeight, pdfHeight - 20));
+                    
+                    const filename = `jadwal-manager-${new Date().toISOString().split('T')[0]}.pdf`;
+                    doc.save(filename);
+                    
+                } catch (error) {
+                    console.error('PDF export error:', error);
+                    alert('Gagal membuat PDF. Coba refresh halaman dan ulangi.');
+                } finally {
+                    document.body.classList.remove('pdf-mode');
+                    this.showLoading(false);
+                }
+            }
 
-                    doc.addImage(imgData, 'PNG', x, y, imgWidthInPdf, imgHeightInPdf);
+            saveData() {
+                const data = this.extractTableData();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `jadwal-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
 
-                    // Gue hapus logika `heightLeft` dan `while` loop karena
-                    // untuk PDF super clean, kita asumsikan semua akan muat di satu halaman
-                    // dengan penyesuaian skala otomatis. Jika tabel terlalu panjang,
-                    // ini bisa jadi masalah, tapi untuk kasus "super clean" yang fokus
-                    // ke print langsung, satu halaman landscape paling efektif.
+            loadData() {
+                this.fileInput.click();
+            }
 
-                    doc.save('jadwal_manajer_bersih.pdf');
+            handleFileLoad(event) {
+                const file = event.target.files[0];
+                if (!file) return;
 
-                    // --- START: PDF specific styling cleanup ---
-                    body.classList.remove('pdf-export-mode');
-                    // --- END: PDF specific styling cleanup ---
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        this.loadTableData(data);
+                        alert('Data berhasil dimuat!');
+                    } catch (error) {
+                        alert('File tidak valid!');
+                    }
+                };
+                reader.readAsText(file);
+            }
 
-                }).catch(error => {
-                    console.error('Terjadi kesalahan saat membuat PDF:', error);
-                    alert('Gagal membuat PDF. Coba lagi atau pastikan tidak ada konten yang aneh.');
-                    body.classList.remove('pdf-export-mode');
+            extractTableData() {
+                const rows = [];
+                Array.from(this.tbody.children).forEach(row => {
+                    const cells = Array.from(row.children);
+                    const rowData = cells.slice(0, -1).map(cell => cell.textContent.trim()); // Exclude action column
+                    rows.push(rowData);
                 });
-            });
+                return { 
+                    timestamp: new Date().toISOString(),
+                    rows: rows 
+                };
+            }
+
+            loadTableData(data) {
+                this.tbody.innerHTML = '';
+                data.rows.forEach(rowData => {
+                    const row = document.createElement('tr');
+                    
+                    rowData.forEach((cellData, index) => {
+                        const cell = document.createElement('td');
+                        if (index === 0) {
+                            cell.className = 'time-cell';
+                        }
+                        cell.contentEditable = 'true';
+                        cell.textContent = cellData;
+                        row.appendChild(cell);
+                    });
+
+                    // Add action cell
+                    const actionCell = document.createElement('td');
+                    actionCell.className = 'action-cell';
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = '🗑️';
+                    actionCell.appendChild(deleteBtn);
+                    row.appendChild(actionCell);
+
+                    this.tbody.appendChild(row);
+                });
+            }
+
+            autoSave() {
+                try {
+                    const data = this.extractTableData();
+                    // Use in-memory storage instead of localStorage
+                    window.scheduleData = data;
+                } catch (error) {
+                    console.warn('Auto-save failed:', error);
+                }
+            }
+
+            loadFromStorage() {
+                try {
+                    if (window.scheduleData) {
+                        this.loadTableData(window.scheduleData);
+                    }
+                } catch (error) {
+                    console.warn('Failed to load from storage:', error);
+                }
+            }
+
+            resetToDefault() {
+                if (confirm('Reset jadwal ke default? Data yang ada akan hilang.')) {
+                    location.reload();
+                }
+            }
+
+            showLoading(show) {
+                this.loadingIndicator.style.display = show ? 'block' : 'none';
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new ScheduleManager();
+        });
+
+        // Add some useful keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        document.getElementById('saveDataBtn').click();
+                        break;
+                    case 'p':
+                        e.preventDefault();
+                        document.getElementById('exportPdfBtn').click();
+                        break;
+                }
+            }
         });
     </script>
 </body>
